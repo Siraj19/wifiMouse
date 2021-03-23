@@ -2,7 +2,10 @@
 import socket
 import mouse
 
-HOST = '192.168.1.183'  # Standard loopback interface address (localhost)
+## getting the hostname by socket.gethostname() method
+hostname = socket.gethostname()
+## getting the IP address using socket.gethostbyname() method
+HOST = socket.gethostbyname(hostname)
 PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
 
 s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
@@ -13,16 +16,16 @@ s.listen()
 def close():
     return "closing now"
 def left():
-    mouse.move(-100, 0, absolute=False, duration=0.2)
+    mouse.move(-10, 0, absolute=False, duration=0.2)
     return "Moved left"
 def right():
-    mouse.move(100, 0, absolute=False, duration=0.2)
+    mouse.move(10, 0, absolute=False, duration=0.2)
     return "Moved right"
 def up():
-    mouse.move(0, -100, absolute=False, duration=0.2)
+    mouse.move(0, -10, absolute=False, duration=0.2)
     return "Moved up"
 def down():
-    mouse.move(0, 100, absolute=False, duration=0.2)
+    mouse.move(0, 10, absolute=False, duration=0.2)
     return "Moved down"
 def left_click():
     return "Clicked Left"
