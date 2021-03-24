@@ -21,9 +21,9 @@ def up():
 def down():
     input_command(b'down')
 def left_click():
-    input_command(b'left_click,')
+    input_command(b'left_click')
 def right_click():
-    input_command(b'right_click,')
+    input_command(b'right_click')
 
 def input_command(command):
 

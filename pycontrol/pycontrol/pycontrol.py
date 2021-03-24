@@ -1,7 +1,11 @@
 
 import socket
 import mouse
+import threading
 
+#global variable
+data=b'0'
+presscheck=False
 ## getting the hostname by socket.gethostname() method
 hostname = socket.gethostname()
 ## getting the IP address using socket.gethostbyname() method
@@ -14,23 +18,49 @@ s.listen()
 
 #Functions for doing tasks
 def close():
+    global presscheck
+    presscheck=False
     return "closing now"
 def left():
-    mouse.move(-10, 0, absolute=False, duration=0.2)
+    global presscheck
+    presscheck=True
+    while True:
+       mouse.move(-5, 0, absolute=False, duration=0.01)
+       if presscheck==False:
+             break
     return "Moved left"
 def right():
-    mouse.move(10, 0, absolute=False, duration=0.2)
+    global presscheck
+    presscheck=True
+    while True:
+       mouse.move(5, 0, absolute=False, duration=0.01)
+       if presscheck==False:
+             break
     return "Moved right"
 def up():
-    mouse.move(0, -10, absolute=False, duration=0.2)
+    global presscheck
+    presscheck=True
+    while True:
+       mouse.move(0, -5, absolute=False, duration=0.01)
+       if presscheck==False:
+             break
     return "Moved up"
 def down():
-    mouse.move(0, 10, absolute=False, duration=0.2)
+    global presscheck
+    presscheck=True
+    while True:
+       mouse.move(0, 5, absolute=False, duration=0.01)
+       if presscheck==False:
+             break
     return "Moved down"
 def left_click():
-    return "Clicked Left"
+    global presscheck
+    presscheck=False
     mouse.click('left')
+    return "Clicked Left"
 def right_click():
+    global presscheck
+    presscheck=False
     mouse.click('right')
     return "Clicked Right"
 def no_recognition():
@@ -38,7 +68,7 @@ def no_recognition():
 
 # Function to convert number into string 
 # Switcher is dictionary data type here 
-def commandline(argument): 
+def commandline(): 
     switcher = { 
         b'close': close, 
         b'left': left,
@@ -48,7 +78,8 @@ def commandline(argument):
         b'left_click': left_click,
         b'right_click': right_click,
                } 
-    func=switcher.get(argument, no_recognition)
+    print(data)
+    func=switcher.get(data, no_recognition)
     return func()
 
  
@@ -56,7 +87,8 @@ def server_mouse():
     #close command
      close_command=b'close'
      last_command=''
-
+     global data
+     global presscheck
      #Waiting for commands and assigining work
      while True:
          conn, addr = s.accept()
@@ -66,7 +98,12 @@ def server_mouse():
             data = conn.recv(1024)
             if data:
              #print(data)
-             print(commandline(data))
+             if presscheck==True:
+                 #presscheck=False
+                 th._stop_event.set()
+             else:
+               th = threading.Thread(target=commandline)
+               th.start()
              last_command=data
             if not data:
              conn.close()
