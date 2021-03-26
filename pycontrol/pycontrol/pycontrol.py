@@ -1,26 +1,27 @@
-
+#Including Libraries
 import socket
 import mouse
 import threading
 
-#global variable
-data=b'0'
-presscheck=False
-## getting the hostname by socket.gethostname() method
-hostname = socket.gethostname()
-## getting the IP address using socket.gethostbyname() method
-HOST = socket.gethostbyname(hostname)
-PORT = 65432        # Port to listen on (non-privileged ports are > 1023)
+# Declaring global variables
+data=b'0'          #For reading data and using in functions 
+presscheck=False   #An easy alternate of stoping thread
 
-s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-s.bind((HOST, PORT))
+
+hostname = socket.gethostname()           # Getting the hostname by socket.gethostname() method
+HOST = socket.gethostbyname(hostname)     # Getting the IP address using socket.gethostbyname() method
+PORT = 50000                              # Assigning a free port number for the connection
+
+s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)  #Creating a TCP connection socket
+s.bind((HOST, PORT))                                 #Assigning our socket IP & Port number
 s.listen()
 
-#Functions for doing tasks
+#Functions for doing different tasks
 def close():
     global presscheck
     presscheck=False
-    return "closing now"
+
+
 def left():
     global presscheck
     presscheck=True
@@ -28,7 +29,7 @@ def left():
        mouse.move(-5, 0, absolute=False, duration=0.01)
        if presscheck==False:
              break
-    return "Moved left"
+
 def right():
     global presscheck
     presscheck=True
@@ -36,7 +37,7 @@ def right():
        mouse.move(5, 0, absolute=False, duration=0.01)
        if presscheck==False:
              break
-    return "Moved right"
+
 def up():
     global presscheck
     presscheck=True
@@ -44,7 +45,7 @@ def up():
        mouse.move(0, -5, absolute=False, duration=0.01)
        if presscheck==False:
              break
-    return "Moved up"
+
 def down():
     global presscheck
     presscheck=True
@@ -52,22 +53,23 @@ def down():
        mouse.move(0, 5, absolute=False, duration=0.01)
        if presscheck==False:
              break
-    return "Moved down"
+
 def left_click():
     global presscheck
     presscheck=False
     mouse.click('left')
-    return "Clicked Left"
+
 def right_click():
     global presscheck
     presscheck=False
     mouse.click('right')
-    return "Clicked Right"
-def no_recognition():
-    return "Can't execute your command"
 
-# Function to convert number into string 
-# Switcher is dictionary data type here 
+def no_recognition():
+
+    print("Invalid Instruction Command")
+
+#This function reads global variable data which is being recieved as a instruction 
+#from the client request and calls appropiate function
 def commandline(): 
     switcher = { 
         b'close': close, 
@@ -78,15 +80,13 @@ def commandline():
         b'left_click': left_click,
         b'right_click': right_click,
                } 
-    print(data)
-    func=switcher.get(data, no_recognition)
+    global data
+    func=switcher.get(data,no_recognition)
     return func()
 
- 
 def server_mouse():
-    #close command
-     close_command=b'close'
-     last_command=''
+     close_command=b'close'           #close command
+     last_command=''                  
      global data
      global presscheck
      #Waiting for commands and assigining work
@@ -97,19 +97,23 @@ def server_mouse():
           while True:
             data = conn.recv(1024)
             if data:
-             #print(data)
              if presscheck==True:
-                 #presscheck=False
-                 th._stop_event.set()
+                 presscheck=False
              else:
                th = threading.Thread(target=commandline)
                th.start()
              last_command=data
+
             if not data:
              conn.close()
              break
-            conn.sendall(data)
+            #conn.sendall(data)
          if last_command ==close_command:
             break
 
-server_mouse()
+# Main code
+print("Server started!")
+print("Host name: ",hostname)
+print("Host ip  : ",HOST)
+thread = threading.Thread(target=server_mouse)
+thread.start()

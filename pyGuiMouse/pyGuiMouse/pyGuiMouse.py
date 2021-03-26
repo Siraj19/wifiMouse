@@ -7,7 +7,7 @@ import tkinter as tk
 ## getting the hostname by socket.gethostname() method
 hostname = socket.gethostname()
 ## getting the IP address using socket.gethostbyname() method
-HOST = socket.gethostbyname(hostname)
+#HOST = socket.gethostbyname(hostname)
 
 #Functions for doing tasks
 def close():
@@ -27,14 +27,12 @@ def right_click():
 
 def input_command(command):
 
-    #HOST = '192.168.1.183'  # The server's hostname or IP address
-    PORT = 65432        # The port used by the server
+    HOST = '192.168.1.183'  # The server's hostname or IP address
+    PORT = 50000        # The port used by the server
 
     s=socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((HOST, PORT))
     s.sendall(command)
-    data = s.recv(1024) 
-    print('Received', repr(data))
 
 
 root = tk.Tk()
